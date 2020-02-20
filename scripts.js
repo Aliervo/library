@@ -1,4 +1,19 @@
-const MY_LIBRARY = [];
+//Firebase setup~~~~~~~~~~~~~~~~~~~~~~~~
+var firebaseConfig = {
+  apiKey: "AIzaSyAjb6PZBq1aRXAALomqPU4SPPeWAY0zc70",
+  authDomain: "odinprojectlibraryapp.firebaseapp.com",
+  databaseURL: "https://odinprojectlibraryapp.firebaseio.com",
+  projectId: "odinprojectlibraryapp",
+  storageBucket: "odinprojectlibraryapp.appspot.com",
+  messagingSenderId: "141145543751",
+  appId: "1:141145543751:web:b9bc341cdbfa0e03fdcd62"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+//End of firebase setup~~~~~~~~~~~~~~~~~
+
+const MY_LIBRARY = firebase.database().ref("myLibrary");
 
 const BODY = document.querySelector("body");
 const NEW_BOOK_BUTTON = document.querySelector("button");
@@ -17,51 +32,60 @@ function Book(title, author, pages, read) {
   this.read = read;
 }
 
-Book.prototype.finishedReading = function() {
-  this.read = true;
-}
-
 function addBookToLibrary(title, author, pages, read) {
   const BOOK = new Book(title, author, pages, read);
-  MY_LIBRARY.push(BOOK);
-  renderBook(BOOK);
+  const PUSH_EVENT = MY_LIBRARY.push();
+  const KEY = PUSH_EVENT.key;
+
+  PUSH_EVENT.set(BOOK);
+  renderBook(KEY);
 }
 
 function removeBookFromLibrary(bookCard) {
-  const INDEX = bookCard.getAttribute("id").slice(4);
+  const ID = bookCard.getAttribute("id");
 
   BODY.removeChild(bookCard);
-  MY_LIBRARY.splice(INDEX, 1);
-
-  const BOOK_CARDS = [...document.querySelectorAll(".book")];
-  BOOK_CARDS.forEach(card => {
-    card.setAttribute("id", `book${BOOK_CARDS.indexOf(card)}`);
-  });
+  MY_LIBRARY.child(ID).off();
+  MY_LIBRARY.child(ID).remove();
 }
 
 function renderBook(book) {
   const BOOK_DIV = document.createElement("div");
-  const TITLE = document.createElement("p");
-  const DELETE = document.createElement("button");
-  const READ_IT = document.createElement("button");
+  const TITLE    = document.createElement("h1");
+  const AUTHOR   = document.createElement("p");
+  const PAGES    = document.createElement("p");
+  const DELETE   = document.createElement("button");
+  const READ_IT  = document.createElement("button");
 
-  BOOK_DIV.setAttribute("id", `book${MY_LIBRARY.length -1}`);
+
+  BOOK_DIV.setAttribute("id", book);
   BOOK_DIV.setAttribute("class", "book");
 
-  TITLE.textContent = book.title;
-
-  DELETE.textContent = "Delete";
-  DELETE.addEventListener("click", () => removeBookFromLibrary(BOOK_DIV));
+  MY_LIBRARY.child(book).on("value", snapshot => {
+    TITLE.textContent  = snapshot.val().title;
+    AUTHOR.textContent = `Author: ${snapshot.val().author}`;
+    PAGES.textContent  = `Pages: ${snapshot.val().pages}`;
+  });
 
   READ_IT.textContent = "Read it?";
   READ_IT.addEventListener("click", () => {
-    book.finishedReading();
+    MY_LIBRARY.child(book + "/read").set(true);
     BOOK_DIV.removeChild(READ_IT);
   });
 
-  BOOK_DIV.appendChild(TITLE);
+  DELETE.textContent = "Delete";
+  DELETE.setAttribute("class", "delete");
+  DELETE.addEventListener("click", () => removeBookFromLibrary(BOOK_DIV));
+
   BOOK_DIV.appendChild(DELETE);
-  if (book.read === false) BOOK_DIV.appendChild(READ_IT);
+  BOOK_DIV.appendChild(TITLE);
+  BOOK_DIV.appendChild(AUTHOR);
+  BOOK_DIV.appendChild(PAGES);
+
+  MY_LIBRARY.child(book).once("value").then(snapshot => {
+    if (snapshot.val().read === false) BOOK_DIV.appendChild(READ_IT);
+  });
+
   BODY.insertBefore(BOOK_DIV, NEW_BOOK_BUTTON);
 }
 
@@ -80,3 +104,7 @@ function processForm() {
   ADD_BOOK_FORM.reset();
   toggleForm();
 }
+
+MY_LIBRARY.once("value").then(snapshot => {
+  Object.keys(snapshot.val()).forEach((key) => renderBook(key));
+});
