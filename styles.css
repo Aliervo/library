@@ -1,17 +1,12 @@
 html{
-  width: 100%;
-  height: 100%;
   background-color: black;
-  margin: 0;
+  margin-top: 2rem;
 }
 
 body{
-  width: inherit;
-  height: inherit;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
 }
 
 form{
@@ -20,13 +15,23 @@ form{
   padding: 10px;
 }
 
+button{
+  background-color: lightgrey;
+  border: 2px outset lightgrey;
+  border-radius: 10px;
+}
+
 .book{
   width: 250px;
   height: 350px;
-  background-color: green;
   text-align: center;
   display: inline-block;
-  border: 5px solid red;
+  background-color: sienna;
+  border: 5px solid;
+  border-bottom-width: 0px;
+  border-left-width: 20px;
+  border-radius: 10px 0px 0px 10px;
+  border-color: white white sienna saddlebrown;
   margin: 25px;
 }
 
@@ -36,10 +41,23 @@ form{
   right: 1rem;
 }
 
+.addBook{
+  background-color: lightgrey;
+  border: 2px outset lightgrey;
+  border-radius: 10px;
+}
+
 .delete{
-  float: right;
+  position: relative;
+  right: 95px;
+  background-color: sienna;
+  border: dotted saddlebrown;
 }
 
 .hidden{
   visibility: hidden;
+}
+
+.delete:hover{
+  background-color: saddlebrown;
 }
