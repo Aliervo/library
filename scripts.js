@@ -26,15 +26,12 @@ const ADD_BOOK_BUTTON = ADD_BOOK_FORM.elements[4];
 
 ADD_BOOK_BUTTON.addEventListener("click", processForm);
 
-function Book(title, author, pages, read) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.read = read;
+function bookFactory(title, author, pages, read) {
+  return {title, author, pages, read};
 }
 
 function addBookToLibrary(title, author, pages, read) {
-  const BOOK = new Book(title, author, pages, read);
+  const BOOK = bookFactory(title, author, pages, read);
   const PUSH_EVENT = MY_LIBRARY.push();
   const KEY = PUSH_EVENT.key;
 
