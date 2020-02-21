@@ -1,3 +1,4 @@
+(() => { //module wrapper to keep the global scope clean
 //Firebase setup~~~~~~~~~~~~~~~~~~~~~~~~
 var firebaseConfig = {
   apiKey: "AIzaSyAjb6PZBq1aRXAALomqPU4SPPeWAY0zc70",
@@ -108,3 +109,4 @@ function processForm() {
 MY_LIBRARY.once("value").then(snapshot => {
   Object.keys(snapshot.val()).forEach((key) => renderBook(key));
 });
+})();
